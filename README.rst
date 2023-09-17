@@ -34,10 +34,9 @@ i18
 ===
 
 
-    Add a short description here!
+    Apply i18 into html
 
 
-A longer description of your project goes here...
 
 
 .. _pyscaffold-notes:
