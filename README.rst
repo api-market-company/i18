@@ -38,6 +38,7 @@ i18
 
 
 Installation from git
+
 .. code-block:: bash
 
    pip install git+https://github.com/api-market-company/i18.git
