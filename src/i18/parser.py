@@ -27,21 +27,21 @@ def remove_stop_words(text):
 class Lexer:
     def __init__(self):
         self.nlp = spacy.load("en_core_web_sm")
-        matcher = Matcher(nlp.vocab)
-        matcher.add("Currency", [[
+        self.matcher = Matcher(self.nlp.vocab)
+        self.matcher.add("Currency", [[
             {"TEXT": "MXN"}
         ]])
-        matcher.add("Email", [[{'LIKE_EMAIL': True}]])
-        matcher.add("Number", [[{'LIKE_NUM': True}]])
-        matcher.add("Url", [[{'LIKE_URL': True}]])
-        matcher.add("BladeExpresion", [[
+        self.matcher.add("Email", [[{'LIKE_EMAIL': True}]])
+        self.matcher.add("Number", [[{'LIKE_NUM': True}]])
+        self.matcher.add("Url", [[{'LIKE_URL': True}]])
+        self.matcher.add("BladeExpresion", [[
             {"TEXT": "{{"},
             {"TEXT": {"REGEX": "\$\w+"}},
             {"TEXT": "->"},
             {"TEXT": {"REGEX": "\w+"}},
             {"TEXT": "}}"}
             ]])
-        matcher.add("Text", [[
+        self.matcher.add("Text", [[
             {
                 "TEXT": {"REGEX": "\w+"}
                 }
@@ -50,7 +50,7 @@ class Lexer:
         self.translation = {
                 'en': {},
                 'es': {}
-                }
+        }
     def translate(self,text):
             key = text.value.strip()
             if len(key) <= 2:
@@ -67,8 +67,8 @@ class Lexer:
             return self.translation
 
     def analyze(self, text):
-        doc = nlp(text)
-        matches = matcher(doc)
+        doc = self.nlp(text)
+        matches = self.matcher(doc)
         return matches
 
 

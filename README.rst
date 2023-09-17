@@ -34,9 +34,13 @@ i18
 ===
 
 
-    Apply i18 into html
+    Apply nlp tasks into some grammar (i.e. html)
 
 
+Installation from git
+.. code-block:: bash
+
+   pip install git+https://github.com/api-market-company/i18.git
 
 
 .. _pyscaffold-notes:
