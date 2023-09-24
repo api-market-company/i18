@@ -1,7 +1,4 @@
 from lark import Lark, Tree, Transformer, Visitor, Token
-import spacy
-from spacy.matcher import Matcher
-
 
 def compile(grammar):
     parser = Parser(grammar)
@@ -13,63 +10,7 @@ def sub(grammar,replace,text):
 
 def search(grammar,text):
    parser = Parser(grammar)
-   return parser.search(replace,text)
-
-def compile_lexer():
-    lexer = Lexer()
-    return lexer
-
-
-def remove_stop_words(text):
-    return text.replace(" ", "_")
-
-
-class Lexer:
-    def __init__(self):
-        self.nlp = spacy.load("en_core_web_sm")
-        self.matcher = Matcher(self.nlp.vocab)
-        self.matcher.add("Currency", [[
-            {"TEXT": "MXN"}
-        ]])
-        self.matcher.add("Email", [[{'LIKE_EMAIL': True}]])
-        self.matcher.add("Number", [[{'LIKE_NUM': True}]])
-        self.matcher.add("Url", [[{'LIKE_URL': True}]])
-        self.matcher.add("BladeExpresion", [[
-            {"TEXT": "{{"},
-            {"TEXT": {"REGEX": "\$\w+"}},
-            {"TEXT": "->"},
-            {"TEXT": {"REGEX": "\w+"}},
-            {"TEXT": "}}"}
-            ]])
-        self.matcher.add("Text", [[
-            {
-                "TEXT": {"REGEX": "\w+"}
-                }
-        ]])
-        self.translator = Translator()
-        self.translation = {
-                'en': {},
-                'es': {}
-        }
-    def translate(self,text):
-            key = text.value.strip()
-            if len(key) <= 2:
-                return self.translation
-            english = self.translator.translate(key, dest="en").text
-            spanish = ""
-            try:
-                spanish = self.translator.translate(english, dest="es").text
-            except:
-                spanish = english
-            key = remove_stop_words(english).lower()
-            self.translation['en'][key] = english
-            self.translation['es'][key] = spanish
-            return self.translation
-
-    def analyze(self, text):
-        doc = self.nlp(text)
-        matches = self.matcher(doc)
-        return matches
+   return parser.search(text)
 
 
 class Parser(Visitor):

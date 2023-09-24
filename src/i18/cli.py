@@ -2,9 +2,8 @@ import argparse
 import logging
 import sys
 
-from i18 import __version__
-from i18.parser import sub
-from i18.grammars import html_grammar
+from i18 import __version__, apply_i18
+import json
 
 
 __author__ = "sanchezcarlosjr"
@@ -14,11 +13,12 @@ __license__ = "MIT"
 _logger = logging.getLogger(__name__)
 
 
-class TransformerAction(argparse.Action):
+class TranslateAction(argparse.Action):
     def __call__(self, parser, namespace, files, option_string=None):
         _logger.debug("Starting...")
         for file in files:
-            print(sub(html_grammar, lambda: token, file.read()))
+            new_text,translations = apply_i18(file.read())
+            print(json.dumps(translations))
         _logger.debug("Ending...")
 
 # ---- CLI ----
@@ -46,10 +46,18 @@ def parse_args(args):
     parser.add_argument(
             dest="infile",
             help="file paths",
-            nargs="?",
-            action=TransformerAction,
+            nargs="+",
+            action=TranslateAction,
             type=argparse.FileType('r'),
             default=sys.stdin
+    )
+    parser.add_argument(
+            "-g",
+            "--grammar",
+            dest="grammar",
+            help="file grammar",
+            nargs="?",
+            type=argparse.FileType('r'),
     )
     parser.add_argument(
         "-v",
