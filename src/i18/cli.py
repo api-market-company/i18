@@ -18,6 +18,9 @@ class TranslateAction(argparse.Action):
         _logger.debug("Starting...")
         for file in files:
             new_text,translations = apply_i18(file.read())
+            if namespace.save:
+               with open(file.name, 'w') as writer:
+                   writer.write(new_text)
             print(json.dumps(translations))
         _logger.debug("Ending...")
 
@@ -37,7 +40,7 @@ def parse_args(args):
     Returns:
       :obj:`argparse.Namespace`: command line parameters namespace
     """
-    parser = argparse.ArgumentParser(description="Transform into i18 html files")
+    parser = argparse.ArgumentParser(description="Transform into i18 based on a grammar")
     parser.add_argument(
         "--version",
         action="version",
@@ -58,6 +61,13 @@ def parse_args(args):
             help="file grammar",
             nargs="?",
             type=argparse.FileType('r'),
+    )
+    parser.add_argument(
+            "-s",
+            "--save",
+            dest="save",
+            help="Write changes in file",
+            action="store_true"
     )
     parser.add_argument(
         "-v",
