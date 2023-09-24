@@ -21,7 +21,7 @@ class TranslateAction(argparse.Action):
                 new_text,translations = apply_i18(file.read())
             except Exception as e:
                 raise Exception(f"In file {file.name} has ocurred an error: {str(e)}")
-            if namespace.save:
+            if namespace.save and translations != {'es': {}, 'en': {}}:
                with open(file.name, 'w') as writer:
                    writer.write(new_text)
             print(json.dumps(translations))

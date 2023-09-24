@@ -62,15 +62,15 @@ html_grammar = """
           | function_call
           | "(" expression ")"
           | "[" expression "=>" expression "]"
-          | variable "[" expression "]"
+          | variable ("[" expression "]" ("[" expression "]")*)
 
-literal: ESCAPED_STRING | NUMBER |  /'.+?(?<!\\\\)'/s
+literal: ESCAPED_STRING | NUMBER |  /'.+?(?<!\\\\)'/s | /null/i | /true/i | /false/i
 
 variable: "$" CNAME
 
 unary_op: "!"
 
-binary_op: "+" | "-" | "*" | "/" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "%" | "==="
+binary_op: "+" | "-" | "*" | "/" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "%" | "===" | "!==" | "<>" | "<=>"
 
 method_call: (package_name "::" | variable "->" | variable "[" expression "]") (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]") ("->" (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]"))*
 

@@ -8,7 +8,7 @@ class Lexer:
     t_BLADE_EXPRESSION = r'@[a-z]+.+'
     t_BLADE_ECHO = r'[.;,]*(({{.*?}})|(\({{.*?}}\))|({!!.+!!}))[.;,]*'
     t_SPECIAL_CHARACTERS = r'[=\/\\\%\^\&\*\-\+\[\]]+'
-    t_NUMBER = r'[0-9]+'
+    t_NUMBER = r'[0-9]+(.[0-9]*)?'
     tokens = (
             'DATE',
             'WHITESPACE',
