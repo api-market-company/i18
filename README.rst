@@ -57,11 +57,10 @@ CLI
 =====================
 
 Apply i18 in Batch
-++++++++++++++++
++++++++++++++++++++
 .. code-block:: bash
 
-   find . -name '*.blade.php' |  xargs -P 8 -I {} i18 -s {} | jq -s | jq 'reduce .[] as $item ({}; .en += $item.en | .es += $item.es)' > translation.json
-
+   find . -name '*.blade.php' | xargs -P 8 -I {} i18 -s {} 2>"error.txt" | jq -s | jq 'reduce .[] as $item ({}; .en += $item.en | .es += $item.es)' > translation.json
 
 
 Python
