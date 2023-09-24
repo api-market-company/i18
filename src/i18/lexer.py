@@ -42,12 +42,12 @@ class Lexer:
         return t
 
     def t_STRING(self,t):
-        r'(?i)[\sA-Za-z!?,¿.!"$\'áéíóúñ]+'
+        r'(?i)[\sA-Za-z!?,¿.\'!"$\'áéíóúñ]+'
         text = t.value.strip()
         if len(text) <= 2:
             return t
         translation = self.target_languages[0][1].translate(text=text)
-        translation = re.sub(r'[\n\s\r\f]{2,}', '', translation)
+        translation = re.sub(r'[\n\s\r\f]{2,}', ' ', translation)
         key = translation.lower().replace(" ", "_").replace(",", "_").replace("\"", "")
         key = re.sub(r'_{2,}', '_', key)
         key = re.sub(r'[.,;]_', '_', key)
