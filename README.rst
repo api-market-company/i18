@@ -10,9 +10,7 @@
     .. image:: https://img.shields.io/coveralls/github/<USER>/i18/main.svg
         :alt: Coveralls
         :target: https://coveralls.io/r/<USER>/i18
-    .. image:: https://img.shields.io/pypi/v/i18.svg
-        :alt: PyPI-Server
-        :target: https://pypi.org/project/i18/
+
     .. image:: https://img.shields.io/conda/vn/conda-forge/i18.svg
         :alt: Conda-Forge
         :target: https://anaconda.org/conda-forge/i18
@@ -27,6 +25,10 @@
     :alt: Project generated with PyScaffold
     :target: https://pyscaffold.org/
 
+.. image:: https://img.shields.io/pypi/v/i18.svg
+        :alt: PyPI-Server
+        :target: https://pypi.org/project/i18/
+
 |
 
 ===
@@ -34,14 +36,40 @@ i18
 ===
 
 
-    Apply nlp tasks into some grammar (i.e. html)
+    Apply nlp tasks into some grammar (i.e. html, yaml, json)
 
+Installation from Pypi
+======================
 
-Installation from git
+.. code-block:: bash
+
+   pip install i18
+
+Installation from Git
+=====================
 
 .. code-block:: bash
 
    pip install git+https://github.com/api-market-company/i18.git
+
+
+CLI
+=====================
+
+Apply i18 in Batch
+++++++++++++++++
+.. code-block:: bash
+
+   find . -name '*.blade.php' |  xargs -P 8 -I {} i18 -s {} | jq -s | jq 'reduce .[] as $item ({}; .en += $item.en | .es += $item.es)' > translation.json
+
+
+
+Python
+=====================
+Consult our `notebooks`_ to learn more. We recommend you starting with `Getting started`_.
+
+.. _notebooks: https://github.com/api-market-company/i18/tree/main/notebooks 
+.. _Getting started: https://github.com/api-market-company/i18/blob/main/notebooks/getting-started.ipynb
 
 
 .. _pyscaffold-notes:
