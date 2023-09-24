@@ -44,19 +44,22 @@ class Lexer:
     def t_STRING(self,t):
         r'(?i)[\sA-Za-z!?,¿.\'!"$\'áéíóúñ]+'
         text = t.value.strip()
-        if len(text) <= 2:
+        if len(text) <= 2 or re.search('(?i)lorem|ipsum|aliquip', text):
             return t
-        translation = self.target_languages[0][1].translate(text=text)
-        translation = re.sub(r'[\n\s\r\f]{2,}', ' ', translation)
-        key = translation.lower().replace(" ", "_").replace(",", "_").replace("\"", "")
-        key = re.sub(r'_{2,}', '_', key)
-        key = re.sub(r'[.,;]_', '_', key)
-        self.translations[self.target_languages[0][0]][key] = translation
-        for index in range(1, len(self.target_languages)):
-            target_language, translator = self.target_languages[index]
-            self.translations[target_language][key] = translator.translate(text=text)
-        t.value = " {{__(\"" + key + "\")}} "
-        return t
+        try:
+            translation = self.target_languages[0][1].translate(text=text)
+            translation = re.sub(r'[\n\s\r\f]{2,}', ' ', translation)
+            key = translation.lower().replace(" ", "_").replace(",", "_").replace("\"", "").replace("'", "_")
+            key = re.sub(r'_{2,}', '_', key)
+            key = re.sub(r'[.,;]_', '_', key)
+            self.translations[self.target_languages[0][0]][key] = translation
+            for index in range(1, len(self.target_languages)):
+                target_language, translator = self.target_languages[index]
+                self.translations[target_language][key] = translator.translate(text=text)
+            t.value = " {{__(\"" + key + "\")}} "
+            return t
+        except:
+            return t
 
     def t_WHITESPACE(self,t):
         r'[\n\r\f]+'
@@ -72,10 +75,7 @@ class Lexer:
     def tokenize(self, text):
         self.lexer.input(text)
         while True:
-            try:
-                token = self.lexer.token()
-            except:
-                yield token
+            token = self.lexer.token()
             if not token:
                 break
             yield token

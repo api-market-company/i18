@@ -7,14 +7,16 @@ html_grammar = """
          | /<style>((?!<\/style>).)+<\/style>/s -> style
          | "<" tag (attribute|blade_expression)* ">"
          | "<" tag (attribute|blade_expression)* "/>"
+         | "@if" "(" args ")" start ("@elseif" "(" args ")" start)+ "@endif"
+         | "@if" "(" args ")" start ("@elseif" "(" args ")" start)+  "@else" start "@endif"
+         | switch_statement
          | "<" tag (attribute|blade_expression)* ">" element* "</" tag ">"
          | foreach
          | whitespace
-         | "@if" /\(((?!<\/?[^>]+\/?>|@[a-z]+).)+\)/ start "@else" start "@endif"
-         | "@if" /\(((?!<\/?[^>]+\/?>|@[a-z]+).)+\)/ start "@endif"
+         | "@if" "(" args ")" start "@endif"
+         | "@if" "(" args ")" start "@else" start "@endif"
          | "@for" "(" /[^;]+;[^;]+;[^)]+/ ")" element "@endfor"
          | "@forelse"  "(" expression "as" expression ")" start "@empty" start "@endforelse"
-         | switch_statement
          | "@while" "(" args? ")" start "@endwhile"
          | "@once" start "@endonce"
          | "@csrf"
@@ -23,27 +25,31 @@ html_grammar = """
          | "@php" /((?!@endphp).)+/si "@endphp"
          | "@can" "(" args? ")" start "@endcan" 
          | "@auth" ( "(" args? ")" )? start "@else" start "@endauth"
+         | "@guest" start "@endguest"
          | "@error" "(" args? ")" start "@enderror" 
+         | "@unless" "(" args? ")" start "@endunless"
          | "@isset" "(" args? ")" start "@endisset"
          | "@component" "(" args? ")" start "@endcomponent"
          | "@break"
          | "@livewireStyles"
          | "@continue"
          | blade_expression
-         | /((?!<\/?[^>]+\/?>|@if|@for|@forelse|@while|@once|@crsf|@push|@pushOnce|@php|@can|@break|@continue|@case|@switch|@endswitch|@break|@default|@livewireStyles|@can|@error|@enderror|@isset|@endisset|@component|@endcomponent).)+/is -> group
+         | /((?!<\/?[^>]+\/?>|@elseif|@if|@for|@forelse|@endfor|@endforelse|@while|@else|@endif|@once|@crsf|@push|@pushOnce|@php|@can|@break|@continue|@case|@switch|@endswitch|@break|@default|@livewireStyles|@can|@error|@enderror|@isset|@endisset|@component|@endcomponent).)+/is -> group
     
     attribute: /[@\:]/? /[a-zA-Z][a-z:0-9A-Z.\-{}$ ]*/ /=(("{{.+?}}")|('{{.+?}}')|("[^"]*")|('[^']*'))/s? | attribute_expression
      
     attribute_expression: /[a-zA-Z@\:]+/ /\(.+\)/
     
     switch_statement: "@switch" /\([^)]+\)/ switch_cases+ "@endswitch"
+
+    elseif_cases: "@elseif" "(" args ")" start?
     
     switch_cases: "@case" /\([^)]+\)/ start "@break" | "@default" start
     
     
     foreach: "@foreach"  "(" /((?!as).)+/ "as" /[^)]+/ ")"  start "@endforeach"
     
-    blade_expression: /{{.+?}}/s | /@[a-z]+\(.+?\)/si | /{!!.+?!!}/
+    blade_expression: /{{.+?}}/s | /@(?!if|for|forelse|endfor|endforelse|while|else|elseif|endif|once|crsf|push|pushOnce|php|can|break|continue|case|switch|endswitch|break|default|livewireStyles|can|error|enderror|isset|endisset|component|endcomponent)[a-z]+/si "(" args? ")" | /{!!.+?!!}/
     
     tag: /([a-z:\.\-0-9]+)/i
     
@@ -52,6 +58,7 @@ html_grammar = """
           | variable
           | unary_op expression
           | expression binary_op expression
+          | method_call
           | function_call
           | "(" expression ")"
           | "[" expression "=>" expression "]"
@@ -63,9 +70,11 @@ variable: "$" CNAME
 
 unary_op: "!"
 
-binary_op: "+" | "-" | "*" | "/" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "%"
+binary_op: "+" | "-" | "*" | "/" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "%" | "==="
 
- function_call: (package_name "::" | variable "->" | variable "[" expression "]") (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]") ("->" (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]"))*
+method_call: (package_name "::" | variable "->" | variable "[" expression "]") (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]") ("->" (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]"))*
+
+ function_call: CNAME "(" args ")"
 
  package_name: CNAME ("\\\\" CNAME)*
 
@@ -79,6 +88,7 @@ args: expression ("," expression)*
     %ignore COMMENT
     %ignore /[ \r\n\t\f]+/x
 """
+
 
 
 json_grammar = """
