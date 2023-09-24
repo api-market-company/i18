@@ -50,6 +50,7 @@ class Lexer:
         translation = re.sub(r'[\n\s\r\f]{2,}', '', translation)
         key = translation.lower().replace(" ", "_").replace(",", "_").replace("\"", "")
         key = re.sub(r'_{2,}', '_', key)
+        key = re.sub(r'[.,;]_', '_', key)
         self.translations[self.target_languages[0][0]][key] = translation
         for index in range(1, len(self.target_languages)):
             target_language, translator = self.target_languages[index]

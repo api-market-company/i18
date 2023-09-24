@@ -1,7 +1,7 @@
 from string import Template
 
 html_grammar = """
-   start: element+
+ start: element+
     
     element: /<script>((?!<\/script>).)+<\/script>/s -> script
          | /<style>((?!<\/style>).)+<\/style>/s -> style
@@ -22,19 +22,21 @@ html_grammar = """
          | "@pushOnce" "(" args? ")" start "@endPushOnce"
          | "@php" /((?!@endphp).)+/si "@endphp"
          | "@can" "(" args? ")" start "@endcan" 
+         | "@auth" ( "(" args? ")" )? start "@else" start "@endauth"
          | "@break"
          | "@livewireStyles"
          | "@continue"
          | blade_expression
          | /((?!<\/?[^>]+\/?>|@if|@for|@forelse|@while|@once|@crsf|@push|@pushOnce|@php|@can|@break|@continue|@case|@switch|@endswitch|@break|@default|@livewireStyles|@can|@end).)+/is -> group
     
-    attribute:  /[a-zA-Z@\:][a-z:A-Z.\-]*(="[^"]*")?/s | attribute_expression
+    attribute: /[@\:]/? /[a-zA-Z][a-z:0-9A-Z.\-{}$ ]*/ /=(("[^"]*")|('[^']*'))/s? | attribute_expression
+     
+    attribute_expression: /[a-zA-Z@\:]+/ /\(.+\)/
     
     switch_statement: "@switch" /\([^)]+\)/ switch_cases+ "@endswitch"
     
     switch_cases: "@case" /\([^)]+\)/ start "@break" | "@default" start
     
-    attribute_expression: /[a-zA-Z@\:]+/ /\(.+\)/
     
     foreach: "@foreach"  "(" /((?!as).)+/ "as" /[^)]+/ ")"  start "@endforeach"
     
@@ -71,7 +73,6 @@ args: expression ("," expression)*
     COMMENT: /<!--.+?-->|{{--.+?--}}|<!DOCTYPE html>/
     %ignore COMMENT
     %ignore /[ \r\n\t\f]+/x
-
 """
 
 

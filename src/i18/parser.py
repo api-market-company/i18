@@ -13,6 +13,14 @@ def search(grammar,text):
    return parser.search(text)
 
 
+def parse(grammar, text):
+    parser = Parser(grammar)
+    return parser.parse(text)
+
+
+def print_pretty(grammar, text):
+    print(parse(grammar, text).pretty())
+
 class Parser(Visitor):
     def __init__(self,grammar):
         super().__init__()  
@@ -26,6 +34,8 @@ class Parser(Visitor):
         matches = [*self.matches]
         self.matches = []
         return matches
+    def parse(self, text):
+        return self.parser.parse(text)
     def sub(self, replace, text):
         tree = self.parser.parse(text)
         self.visit(tree)
