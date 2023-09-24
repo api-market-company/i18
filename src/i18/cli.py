@@ -17,7 +17,10 @@ class TranslateAction(argparse.Action):
     def __call__(self, parser, namespace, files, option_string=None):
         _logger.debug("Starting...")
         for file in files:
-            new_text,translations = apply_i18(file.read())
+            try:
+                new_text,translations = apply_i18(file.read())
+            except Exception as e:
+                raise Exception(f"In file {file.name} has ocurred an error: {str(e)}")
             if namespace.save:
                with open(file.name, 'w') as writer:
                    writer.write(new_text)

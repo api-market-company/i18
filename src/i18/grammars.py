@@ -23,13 +23,16 @@ html_grammar = """
          | "@php" /((?!@endphp).)+/si "@endphp"
          | "@can" "(" args? ")" start "@endcan" 
          | "@auth" ( "(" args? ")" )? start "@else" start "@endauth"
+         | "@error" "(" args? ")" start "@enderror" 
+         | "@isset" "(" args? ")" start "@endisset"
+         | "@component" "(" args? ")" start "@endcomponent"
          | "@break"
          | "@livewireStyles"
          | "@continue"
          | blade_expression
-         | /((?!<\/?[^>]+\/?>|@if|@for|@forelse|@while|@once|@crsf|@push|@pushOnce|@php|@can|@break|@continue|@case|@switch|@endswitch|@break|@default|@livewireStyles|@can|@end).)+/is -> group
+         | /((?!<\/?[^>]+\/?>|@if|@for|@forelse|@while|@once|@crsf|@push|@pushOnce|@php|@can|@break|@continue|@case|@switch|@endswitch|@break|@default|@livewireStyles|@can|@error|@enderror|@isset|@endisset|@component|@endcomponent).)+/is -> group
     
-    attribute: /[@\:]/? /[a-zA-Z][a-z:0-9A-Z.\-{}$ ]*/ /=(("[^"]*")|('[^']*'))/s? | attribute_expression
+    attribute: /[@\:]/? /[a-zA-Z][a-z:0-9A-Z.\-{}$ ]*/ /=(("{{.+?}}")|('{{.+?}}')|("[^"]*")|('[^']*'))/s? | attribute_expression
      
     attribute_expression: /[a-zA-Z@\:]+/ /\(.+\)/
     
@@ -51,6 +54,8 @@ html_grammar = """
           | expression binary_op expression
           | function_call
           | "(" expression ")"
+          | "[" expression "=>" expression "]"
+          | variable "[" expression "]"
 
 literal: ESCAPED_STRING | NUMBER |  /'.+?(?<!\\\\)'/s
 
@@ -60,7 +65,7 @@ unary_op: "!"
 
 binary_op: "+" | "-" | "*" | "/" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "%"
 
- function_call: (package_name "::" | variable "->") (CNAME "(" args? ")" | CNAME) ("->" (CNAME "(" args? ")" | CNAME))*
+ function_call: (package_name "::" | variable "->" | variable "[" expression "]") (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]") ("->" (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]"))*
 
  package_name: CNAME ("\\\\" CNAME)*
 
@@ -70,7 +75,7 @@ args: expression ("," expression)*
 %import common.ESCAPED_STRING
 %import common.NUMBER
 
-    COMMENT: /<!--.+?-->|{{--.+?--}}|<!DOCTYPE html>/
+    COMMENT: /<!--->|<!---->|<!--.+?-->|{{--.+?--}}|<!DOCTYPE html.*?>/
     %ignore COMMENT
     %ignore /[ \r\n\t\f]+/x
 """
