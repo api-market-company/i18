@@ -32,9 +32,10 @@ html_grammar = """
          | "@component" "(" args? ")" start "@endcomponent"
          | "@break"
          | "@livewireStyles"
+         | "@empty"
          | "@continue"
          | blade_expression
-         | /((?!<\/?[^>]+\/?>|@elseif|@if|@for|@forelse|@endfor|@endforelse|@while|@else|@endif|@once|@crsf|@push|@pushOnce|@php|@can|@break|@continue|@case|@switch|@endswitch|@break|@default|@livewireStyles|@can|@error|@enderror|@isset|@endisset|@component|@endcomponent).)+/is -> group
+         | /((?!<\/?[^>]+\/?>|@elseif|@if|@for|@forelse|@endfor|@endforelse|@while|@else|@endif|@once|@crsf|@push|@pushOnce|@php|@can|@break|@continue|@case|@switch|@endswitch|@break|@default|@livewireStyles|@can|@error|@enderror|@isset|@endisset|@empty|@component|@endcomponent).)+/is -> group
     
     attribute: /[@\:]/? /[a-zA-Z][a-z:0-9A-Z.\-{}$ ]*/ /=(("{{.+?}}")|('{{.+?}}')|("[^"]*")|('[^']*'))/s? | attribute_expression
      
@@ -62,7 +63,9 @@ html_grammar = """
           | function_call
           | "(" expression ")"
           | "[" expression "=>" expression "]"
+          | variable "=>" variable
           | variable ("[" expression "]" ("[" expression "]")*)
+          | expression "?" expression ":" expression
 
 literal: ESCAPED_STRING | NUMBER |  /'.+?(?<!\\\\)'/s | /null/i | /true/i | /false/i
 
@@ -70,11 +73,11 @@ variable: "$" CNAME
 
 unary_op: "!"
 
-binary_op: "+" | "-" | "*" | "/" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "%" | "===" | "!==" | "<>" | "<=>"
+binary_op: "+" | "-" | "*" | "/" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "%" | "===" | "!==" | "<>" | "<=>" | "&&" | "||" | "and" | "or" | "??"
 
-method_call: (package_name "::" | variable "->" | variable "[" expression "]") (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]") ("->" (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]"))*
+method_call: (package_name "::" | variable "->" | variable "[" expression "]" | function_call "->") (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]") ("->" (CNAME "(" args? ")" | CNAME | CNAME "[" expression "]"))*
 
- function_call: CNAME "(" args ")"
+ function_call: CNAME "(" args? ")"
 
  package_name: CNAME ("\\\\" CNAME)*
 

@@ -43,7 +43,7 @@ class Lexer:
 
     def t_STRING(self,t):
         r'(?i)[\sA-Za-z!?,¿.\'!"$\'áéíóúñ]+'
-        text = t.value.strip()
+        text =  bytes(t.value.strip(), "utf-8").decode("unicode_escape")
         if len(text) <= 2 or re.search('(?i)lorem|ipsum|aliquip', text):
             return t
         try:
@@ -52,6 +52,7 @@ class Lexer:
             key = translation.lower().replace(" ", "_").replace(",", "_").replace("\"", "").replace("'", "_")
             key = re.sub(r'_{2,}', '_', key)
             key = re.sub(r'[.,;]_', '_', key)
+            key = re.sub(r'(_$)|(^_)', lambda x: "", key)
             self.translations[self.target_languages[0][0]][key] = translation
             for index in range(1, len(self.target_languages)):
                 target_language, translator = self.target_languages[index]

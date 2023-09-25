@@ -8,9 +8,9 @@ def sub(grammar,replace,text):
    parser = Parser(grammar)
    return parser.sub(replace,text)
 
-def search(grammar,text):
+def match(grammar,text):
    parser = Parser(grammar)
-   return parser.search(text)
+   return parser.match(text)
 
 
 def parse(grammar, text):
@@ -28,7 +28,7 @@ class Parser(Visitor):
         self.parser = Lark(grammar, propagate_positions=True)
     def group(self, tree):
         self.matches.extend(tree.children)
-    def search(self,text):
+    def match(self,text):
         tree = self.parser.parse(text)
         self.visit(tree)
         matches = [*self.matches]
