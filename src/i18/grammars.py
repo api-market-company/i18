@@ -95,14 +95,12 @@ args: expression ("," expression)*
 
 
 json_grammar = """
-  start: /"/ group /"/
+  start: $GROUP -> group
          | dict
          | list
          | ESCAPED_STRING
          | SIGNED_NUMBER
          | "true" | "false" | "null"
-         
-    group: $GROUP
 
     list : "[" [start ("," start)*] "]"
 
