@@ -1,16 +1,25 @@
-import pytest
-
-from i18.lexer import Lexer
+from i18.parser import sub
 
 __author__ = "sanchezcarlosjr"
 __copyright__ = "sanchezcarlosjr"
 __license__ = "MIT"
 
 
-def get_values(tokens):
-    return [(str(token), token.label_) for token in tokens]
+def test_replacement():
+    assert "(0+( 1 + 0 ) + 1 )     +1" == sub("""
+    start: expression
 
-def test_basic_expressions():
-    lexer = Lexer()
-    print(lexer.analyze("Hello World"))
+    expression: atom ("+"|"-"|"*"|"/") expression | atom
 
+    atom: SIGNED_NUMBER -> group
+        | "(" expression ")"
+
+    %import common.SIGNED_NUMBER
+    %import common.WS
+    %ignore WS
+
+    """, lambda token: str(int(token) % 2), "(4+( 5 + 6 ) + 5 )     +3")
+    assert "1" == sub("""
+        start: expression
+        expression: /123/ -> group
+        """, lambda token: "1", "123")

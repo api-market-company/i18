@@ -1,5 +1,5 @@
 import ply.lex as lex
-from deep_translator import (GoogleTranslator,DeeplTranslator)
+from deep_translator import (GoogleTranslator)
 import re
 
 
@@ -9,20 +9,16 @@ class Lexer:
     t_BLADE_ECHO = r'[.;,]*(({{.*?}})|(\({{.*?}}\))|({!!.+!!}))[.;,]*'
     t_SPECIAL_CHARACTERS = r'[=\/\\\%\^\&\*\-\+\[\]]+'
     t_NUMBER = r'[0-9]+(.[0-9]*)?'
-    tokens = (
-            'DATE',
-            'WHITESPACE',
-            'EMAIL',
-            'BLADE_COMMENT',
-            'BLADE_ECHO',
-            'STRING',
-            'BLADE_EXPRESSION',
-            'NUMBER',
-            'SPECIAL_CHARACTERS',
-        )
-    def __init__(self, target_languages={'es': GoogleTranslator(source='auto', target='es'), 'en': GoogleTranslator(source='auto', target='en')}, default_language='en', **kwargs):
+    tokens = ('DATE', 'WHITESPACE', 'EMAIL', 'BLADE_COMMENT', 'BLADE_ECHO', 'STRING', 'BLADE_EXPRESSION', 'NUMBER',
+              'SPECIAL_CHARACTERS',)
+
+    def __init__(self, target_languages=None, default_language='en',
+                 **kwargs):
+        if target_languages is None:
+            target_languages = {'es': GoogleTranslator(source='auto', target='es'),
+                                'en': GoogleTranslator(source='auto', target='en')}
         self.translations = {key: {} for key in target_languages.keys()}
-        self.target_languages = [None]*len(target_languages)
+        self.target_languages = [None] * len(target_languages)
         i = 1
         for target_language, translator in target_languages.items():
             if target_language == default_language:
@@ -32,18 +28,13 @@ class Lexer:
                 i += 1
         self.lexer = lex.lex(object=self, **kwargs)
 
-    def t_EMAIL(self,t):
+    def t_EMAIL(self, t):
         r'[\w.-]+@([\w-]+.)+[\w-]{2,4}'
         return t
 
-    def t_DATE(self,t):
-        r"((?i)\b(mon(?:day|ady|dya|dai)?|tues(?:day|ady|dya|dai)?|wed(?:nesday|ensday|nesdai)?|thurs(?:day|ady|dya|dai)?|fri(?:day|ady|dya|dai)?|sat(?:urday|erday|urady|urday)?|sun(?:day|ady|dya|dai)?)\b.* (?i)\b(jan(?:uary|uari|uaray|uare)?|feb(?:ruary|urary|ruari|ruary)?|mar(?:ch|hc)?|apr(?:il|li)?|may|jun(?:e|e)?|jul(?:y|y)?|aug(?:ust|sut|ust)?|sep(?:tember|tembre|tembr)?|oct(?:ober|obre|ober)?|nov(?:ember|embre|embr)?|dec(?:ember|embre|embr)?)\b .* \d{1,2})|\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2}), (\d{4})\b"
-        t.value = "TODO: \Carbon\Carbon::parse()"
-        return t
-
-    def t_STRING(self,t):
-        r'(?i)[\sA-Za-z!?,¿.\'!"$\'áéíóúñ]+'
-        text =  bytes(t.value.strip(), "utf-8").decode("unicode_escape")
+    def t_STRING(self, t):
+        r'[\sA-Za-z!?,¿.\'!"$\'áéíóúñÁÉÍÓÚÑ]+'
+        text = bytes(t.value.strip(), "utf-8").decode("unicode_escape")
         if len(text) <= 2 or re.search('(?i)lorem|ipsum|aliquip', text):
             return t
         try:
@@ -62,12 +53,12 @@ class Lexer:
         except:
             return t
 
-    def t_WHITESPACE(self,t):
+    def t_WHITESPACE(self, t):
         r'[\n\r\f]+'
         t.value = " "
         return t
 
-    def t_error(self,t):
+    def t_error(self, t):
         t.type = "DEFAULT"
         t.value = t.value[0]
         t.lexer.lexpos += 1

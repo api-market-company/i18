@@ -62,6 +62,9 @@ Apply i18 in Batch
 
    find . -name '*.blade.php' | xargs -P 8 -I {} i18 -s {} 2>"error.txt" | jq -s | jq 'reduce .[] as $item ({}; .en += $item.en | .es += $item.es)' > translation.json
 
+.. code-block:: bash
+
+   jq -s '.[0].en + .[1]' translation.json en.json > en.json
 
 Python
 =====================
